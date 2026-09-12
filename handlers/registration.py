@@ -100,11 +100,24 @@ async def process_anonymous_message(message: Message, state: FSMContext):
         await message.answer("ارسال پیام ناموفق بود، احتمالاً طرف مقابل ربات رو استارت نکرده یا بلاکش کرده.")
 
 
-@router.message(Registration.waiting_name)
+@router.message(Registration.waiting_name, F.text)
 async def process_name(message: Message, state: FSMContext):
-    await state.update_data(name=message.text)
+    name = message.text.strip()
+    if not name or name.startswith("/"):
+        await message.answer("لطفاً یه اسم معتبر بنویس (نمی‌تونه خالی باشه).")
+        return
+    if len(name) > 30:
+        await message.answer("اسم خیلی طولانیه، لطفاً حداکثر ۳۰ حرف بنویس.")
+        return
+
+    await state.update_data(name=name)
     await message.answer("چند سالته؟ (فقط عدد بنویس)")
     await state.set_state(Registration.waiting_age)
+
+
+@router.message(Registration.waiting_name)
+async def process_name_invalid(message: Message):
+    await message.answer("لطفاً اسمت رو به صورت متن بنویس 📝")
 
 
 @router.message(Registration.waiting_age)
@@ -139,18 +152,44 @@ async def process_gender(message: Message, state: FSMContext):
     await state.set_state(Registration.waiting_city)
 
 
-@router.message(Registration.waiting_city)
+@router.message(Registration.waiting_city, F.text)
 async def process_city(message: Message, state: FSMContext):
-    await state.update_data(city=message.text)
+    city = message.text.strip()
+    if not city:
+        await message.answer("لطفاً اسم شهرت رو بنویس.")
+        return
+    if len(city) > 30:
+        await message.answer("اسم شهر خیلی طولانیه، لطفاً کوتاه‌تر بنویس.")
+        return
+
+    await state.update_data(city=city)
     await message.answer("یه بیوگرافی کوتاه درباره خودت بنویس (چند جمله کافیه)")
     await state.set_state(Registration.waiting_bio)
 
 
-@router.message(Registration.waiting_bio)
+@router.message(Registration.waiting_city)
+async def process_city_invalid(message: Message):
+    await message.answer("لطفاً اسم شهرت رو به صورت متن بنویس 📝")
+
+
+@router.message(Registration.waiting_bio, F.text)
 async def process_bio(message: Message, state: FSMContext):
-    await state.update_data(bio=message.text)
+    bio = message.text.strip()
+    if not bio:
+        await message.answer("لطفاً یه بیوگرافی کوتاه بنویس.")
+        return
+    if len(bio) > 300:
+        await message.answer("بیوگرافی خیلی طولانیه، لطفاً حداکثر ۳۰۰ حرف بنویس.")
+        return
+
+    await state.update_data(bio=bio)
     await message.answer("حالا یه عکس پروفایل بفرست 📸")
     await state.set_state(Registration.waiting_photo)
+
+
+@router.message(Registration.waiting_bio)
+async def process_bio_invalid(message: Message):
+    await message.answer("لطفاً بیوگرافیت رو به صورت متن بنویس 📝")
 
 
 @router.message(Registration.waiting_photo, F.photo)

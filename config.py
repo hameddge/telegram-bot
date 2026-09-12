@@ -2,9 +2,18 @@
 """
 تنظیمات اصلی ربات
 """
+import os
 
-# توکنی که از BotFather گرفتی رو اینجا بذار
-BOT_TOKEN = "8815170358:AAErd1eurYKLBNVojBmxKGipwKbIdpjsiIY"
+# توکن ربات دیگه اینجا نوشته نمیشه (امن نیست)!
+# به‌جاش، قبل از اجرا یه متغیر محیطی به اسم BOT_TOKEN ست کن.
+# لینوکس/مک: export BOT_TOKEN="توکن_جدیدت"
+# ویندوز (PowerShell): $env:BOT_TOKEN="توکن_جدیدت"
+# روی هاست (Railway/Render و ...): تو بخش Environment Variables اضافه‌اش کن.
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+if not BOT_TOKEN:
+    raise RuntimeError(
+        "متغیر محیطی BOT_TOKEN ست نشده! توکن ربات رو به‌عنوان Environment Variable اضافه کن."
+    )
 
 # مسیر فایل دیتابیس (خودش ساخته میشه، نیازی به کاری نیست)
 DB_PATH = "dating_bot.db"
